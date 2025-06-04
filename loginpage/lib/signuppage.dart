@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:loginpage/core/theme/app_pallete.dart';
 import 'package:loginpage/core/theme/theme.dart';
+import 'package:loginpage/loginpage.dart';
 import 'package:loginpage/widgets/auth_gradient_button.dart';
 import 'package:loginpage/widgets/custom_field.dart';
 
 class Signuppage extends StatefulWidget {
+  static route() => MaterialPageRoute(
+   builder: (context) => const Signuppage(),
+   );
   const Signuppage({super.key});
 
   @override
@@ -12,6 +16,7 @@ class Signuppage extends StatefulWidget {
 }
 
 class _SignuppageState extends State<Signuppage> {
+  
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final employeeIdController = TextEditingController();
@@ -47,12 +52,17 @@ Widget build(BuildContext context) {
               ),
             ),
             alignment: Alignment.centerLeft,
-            child: const Column(
+            child:  Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.arrow_back, color: Colors.white),
+                GestureDetector(
+                  onTap: () {
+                   Navigator.push(context, Loginpage.route());
+                  },
+                child: Icon(Icons.arrow_back, color: Colors.white),
+                ),
                 SizedBox(height: 20),
-                Text(
+                const Text(
                   "Register",
                   style: TextStyle(
                     color: Colors.white,
@@ -71,7 +81,6 @@ Widget build(BuildContext context) {
               ],
             ),
           ),
-
           
           Padding(
             padding: const EdgeInsets.all(15.0),
@@ -116,9 +125,13 @@ Widget build(BuildContext context) {
                       },
                   ),
                   const SizedBox(height: 20),
-                  AuthGradientButton(),
+                  const AuthGradientButton(buttonText: "Register",),
                   const SizedBox(height: 20),
-                  RichText(
+                  GestureDetector(
+                     onTap: () {
+                        Navigator.push(context, Loginpage.route());
+                      },
+                child: RichText(
                     text: TextSpan(
                       text: 'I have an account?',
                       style: Theme.of(context)
@@ -133,7 +146,7 @@ Widget build(BuildContext context) {
                         ),
                       ],
                     ),
-                  ),
+                  ),),
                 ],
               ),
             ),
