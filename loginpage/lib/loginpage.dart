@@ -17,6 +17,7 @@ class Loginpage extends StatefulWidget {
 
 class _LoginpageState extends State<Loginpage> {
   final mobileNoController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -66,6 +67,7 @@ class _LoginpageState extends State<Loginpage> {
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Form(
+                key: _formKey,
                 child: Column(
                   children: [
                     CustomField(
@@ -84,8 +86,11 @@ class _LoginpageState extends State<Loginpage> {
                     const SizedBox(height: 20),
                     AuthGradientButton(
                       buttonText: "Send OTP",
-                      onPressed: () {//here another logic needs to be implemented for checking if user mobile no exists or not 
-                        Navigator.push(context, Otppage.route());
+                      onPressed: () {
+                        //here another logic needs to be implemented for checking if user mobile no exists or not
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(context, Otppage.route());
+                        }
                       },
                     ), // here i will use onpressed which will direct to otppage
                     const SizedBox(height: 20),

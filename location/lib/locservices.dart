@@ -11,20 +11,43 @@ class LocationServices extends StatefulWidget {
 }
 
 class _LocationServicesState extends State<LocationServices> {
-  getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      logex.log("Location Denied");
-      LocationPermission ask = await Geolocator.requestPermission();
-    } else {
-      Position currentpos = await Geolocator.getCurrentPosition(
-        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
-      );
-      logex.log("Latitude=${currentpos.latitude.toString()}");
-      logex.log("Longitude=${currentpos.longitude.toString()}");
+  Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+// final LocationSettings locationSettings = LocationSettings(
+//   accuracy: LocationAccuracy.high,
+//   distanceFilter: 100,
+//   timeLimit: Duration(minutes: 40)
+
+// );
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
     }
   }
+  
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+      'Location permissions are permanently denied, we cannot request permissions.');
+  } 
+
+  return await Geolocator.getCurrentPosition(
+    locationSettings: LocationSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 50,
+      timeLimit: Duration(minutes: 10)
+    )
+  );
+  
+}
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +60,9 @@ class _LocationServicesState extends State<LocationServices> {
         body: Center(
           child: ElevatedButton(
               onPressed: () {
-                getCurrentLocation();
+                _determinePosition(
+                  
+                );
               },
               child: Text("Get Location")),
         ),

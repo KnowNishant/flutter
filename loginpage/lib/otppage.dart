@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:loginpage/core/theme/app_pallete.dart';
 import 'package:loginpage/homepage.dart';
@@ -16,6 +19,43 @@ class Otppage extends StatefulWidget {
 class _OtppageState extends State<Otppage> {
   final int _correctOtp = 123456;
   String _enteredOtp = '';
+  int _secondsRemaining = 30;
+  Timer? _timer;
+
+  void startTimer() {
+    _secondsRemaining = 30;
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void resendOtp() {
+    // I can later trigger API call here to resend OTP
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("OTP has been resent ✅")));
+    startTimer();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,22 +107,19 @@ class _OtppageState extends State<Otppage> {
                   height: 56,
                   textStyle: const TextStyle(
                     fontSize: 22,
-                    color: Color.fromARGB(255, 7, 7, 7), 
+                    color: Color.fromARGB(255, 7, 7, 7),
                     fontWeight: FontWeight.w600,
                   ),
                   decoration: BoxDecoration(
-                  //  color: Color(0xFF1E2A38), 
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.black, 
+                    //  color: Color(0xFF1E2A38),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black),
                   ),
-                  )
                 ),
                 keyboardType: TextInputType.number,
                 length: 6,
                 onChanged: (value) {
-                  _enteredOtp =
-                      value; // here i am storing user inputted otp in my variable private enteredotp
+                  _enteredOtp =value; // here i am storing user inputted otp in my variable private enteredotp
                 },
               ),
             ),
@@ -99,7 +136,9 @@ class _OtppageState extends State<Otppage> {
                 }
               },
             ),
+
             SizedBox(height: 40),
+
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
@@ -111,8 +150,13 @@ class _OtppageState extends State<Otppage> {
                 children: [
                   WidgetSpan(child: SizedBox(height: 25)),
                   TextSpan(
-                    text: "RESEND NEW CODE",
+                    text: _secondsRemaining > 0
+                        ? 'Resend in $_secondsRemaining sec'
+                        : 'RESEND NEW CODE',
                     style: TextStyle(color: Color.fromARGB(255, 166, 187, 59)),
+                    recognizer: _secondsRemaining == 0
+                        ? (TapGestureRecognizer()..onTap = resendOtp)
+                        : null,
                   ),
                 ],
               ),
